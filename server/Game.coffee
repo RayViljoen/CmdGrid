@@ -3,9 +3,6 @@ module.exports = class Game
 
 	constructor: (levelNum, player = 'Guest') ->
 
-		# Include scorekeeper to record winning score
-		@scoreKeeper = require('./score').save
-
 		# Reset level incase not the first round
 		@level = {}
 
@@ -84,9 +81,6 @@ module.exports = class Game
 
 		# Check if position is on _finish
 		win = @level.position is @level.finish
-
-		# Check if score should be recorded
-		@scoreKeeper @level.player, @level.num, @level.moves if win
 
 		# Return ok with new tile xy
 		{ok:yes, moves:@level.moves, tile:{x:x,y:y}, win:win}

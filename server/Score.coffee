@@ -1,0 +1,1 @@
+console.log 'Save game to some db'

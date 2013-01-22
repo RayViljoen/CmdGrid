@@ -1,6 +1,6 @@
 
 # Get game class
-Game = require './GameClass'
+Game = require '../Game'
 
 # Empty game instance
 game = {}
