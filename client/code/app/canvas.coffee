@@ -22,20 +22,16 @@ window.game =
 			height: cSize.height
 			# Draggable only if canvas is bigger than container
 			draggable: (cSize.width < mapSize)
-
-		# Removing loading gif
-		$('#canvas').css 'background-image', 'none'
 		
 		# Create layer
 		@layer = new Kinetic.Layer()
 
 		# Set general polygon dimaensions
-		nH = tileSize/4
-		nW = tileSize/2
-
-		nStart =
-			x: cSize.width/2
-			y: (cSize.height/2)-(nH*4)
+		dim = {}
+		dim.h = tileSize/4
+		dim.w = tileSize/2
+		dim.x = cSize.width/2
+		dim.y = (cSize.height/2)-(dim.h*4)
 
 		# Group of tiles
 		@tiles = new Kinetic.Group()
@@ -45,23 +41,24 @@ window.game =
 			for tile in [0...(map.length)]
 				node = new Kinetic.Polygon
 					name: "Tile:#{row}:#{tile}"
-					x: nStart.x+(nW*tile)
-					y: nStart.y+(nH*tile)
-					points: [ 0, 0, -nW, nH, 0, nW, nW, nH ]
+					x: dim.x+(dim.w*tile)
+					y: dim.y+(dim.h*tile)
+					points: [ 0, 0, -dim.w, dim.h, 0, dim.w, dim.w, dim.h ]
 					fill: 'yellow'
 
 				# Add to group
 				@tiles.add node
 
 			# Move to next row
-			nStart.x -= nW
-			nStart.y += nH
+			dim.x -= dim.w
+			dim.y += dim.h
 
 		# Add to layer
 		@layer.add @tiles
 
+		# Removing loading gif
+		$('#canvas').css 'background-image', 'none'
+
 		# Add main layer to stage
 		@stage.add @layer
-
-
 
