@@ -7,7 +7,7 @@ module.exports = class Game
 		@level = {}
 
 		# Load level from config or fail gracefully if not found
-		try @level = require "./levels/#{levelNum}"
+		try @level = require "./levels/#{levelNum}/"
 		catch e then return no
 
 		# Store level number
