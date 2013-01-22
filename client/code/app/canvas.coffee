@@ -29,15 +29,6 @@ window.game =
 		# Create layer
 		@layer = new Kinetic.Layer()
 
-		# No real reason to have main map polygon
-		# @terrain = new Kinetic.Polygon
-		# 	x: cSize.width/2
-		# 	y: cSize.height/2
-		# 	points: [-mapSize/2, 0, 0, mapSize/4, mapSize/2, 0, 0, -mapSize/4]
-		# 	fill: 'blue'
-
-		# @layer.add @terrain
-
 		# Set general polygon dimaensions
 		nH = tileSize/4
 		nW = tileSize/2

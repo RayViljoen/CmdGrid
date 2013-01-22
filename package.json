@@ -1,9 +1,8 @@
 {
   "name": "RoverGame",
-  "description": "An awesome real time application",
+  "description": "Fubra Universe instructional Rover game",
   "version": "0.0.1",
-  "author": "Me <me@mydomain.com>",
-  "private": true,
+  "author": "Ray Viljoen <rayviljoen@me.com>",
   "engines": {
     "node": ">= 0.6.0"
   },
