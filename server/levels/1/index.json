@@ -1,5 +1,6 @@
 {	
-	"size": 10,
+	"tile": 90,
+	"grid": 8,
 	"start": "0:0",
 	"direction": "east",
 	"finish": "0:1",

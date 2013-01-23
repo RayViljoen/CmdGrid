@@ -1,11 +1,23 @@
 
+# TODO:
+# Create game class instead
+# Move all dom logic to arguments from app.coffee
+
+
+# Global game object
 window.game =
 
-	# Create level map
-	load: (map) ->
+	# Toggle grid overlay visibillity
+	toggleGrid: =>
+		if @grid.getVisible() then do @grid.hide else do @grid.show
+		do @layer.draw
 
-		# Tile size
-		tileSize = 90
+	# Create level map
+	load: (levelData, images) =>
+
+		# Assign data to some easier vars
+		map = levelData.map
+		tileSize = levelData.tile
 
 		# Calculate size of map based on 90px tiles
 		mapSize = tileSize * map.length
@@ -31,19 +43,43 @@ window.game =
 		dim.h = tileSize/4
 		dim.w = tileSize/2
 		dim.x = cSize.width/2
-		dim.y = (cSize.height/2)-(dim.h*4)
+		dim.y = (cSize.height/2)-mapSize/4
+
+		# Create terrain
+		@grid = new Kinetic.Polygon
+			visible: no
+			fillPatternImage: images.grid
+			fillPatternOffset: [0,dim.h]
+			x: cSize.width/2
+			y: (cSize.height/2)-mapSize/4
+			points: [
+				[-mapSize/2, mapSize/4]
+				[0, mapSize/2]
+				[mapSize/2, mapSize/4]
+				[0, 0]
+			]
+
+		# Create terrain
+		@terrain = new Kinetic.Polygon
+			x: cSize.width/2
+			y: (cSize.height/2)-mapSize/4
+			points: [
+				[-mapSize/2, mapSize/4]
+				[0, mapSize/2]
+				[mapSize/2, mapSize/4]
+				[0, 0]
+			]
 
 		# Group of tiles
 		@tiles = new Kinetic.Group()
 
-		# Lay tiles
 		for row in [0...(map.length)]
 			for tile in [0...(map.length)]
-				node = new Kinetic.Polygon
+				node = new Kinetic.Circle
+					radius: 4
 					name: "Tile:#{row}:#{tile}"
 					x: dim.x+(dim.w*tile)
-					y: dim.y+(dim.h*tile)
-					points: [ 0, 0, -dim.w, dim.h, 0, dim.w, dim.w, dim.h ]
+					y: dim.y+(dim.h*tile)+dim.h
 					fill: 'yellow'
 
 				# Add to group
@@ -53,12 +89,11 @@ window.game =
 			dim.x -= dim.w
 			dim.y += dim.h
 
-		# Add to layer
-		@layer.add @tiles
-
 		# Removing loading gif
 		$('#canvas').css 'background-image', 'none'
 
-		# Add main layer to stage
+		# Add objects to canvas
+		@layer.add @terrain
+		@layer.add @tiles
+		@layer.add @grid
 		@stage.add @layer
-

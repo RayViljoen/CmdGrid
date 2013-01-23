@@ -6,6 +6,10 @@ module.exports = class Game
 		# Reset level incase not the first round
 		@level = {}
 
+		# Make sure levelNum is nothing other than a round number
+		# Do not want user specied include paths in require statement that follows
+		return no unless levelNum = Math.round(Math.abs levelNum)
+
 		# Load level from config or fail gracefully if not found
 		try @level = require "./levels/#{levelNum}/"
 		catch e then return no
@@ -23,8 +27,8 @@ module.exports = class Game
 		@level.moves = 0
 
 		row = []
-		row.push 0 for i in [1..@level.size]
-		@level.map.push row[..] for i in [1..@level.size]
+		row.push 0 for i in [1..@level.grid]
+		@level.map.push row[..] for i in [1..@level.grid]
 
 		# Loop level and add objects to map
 		@setTile coord, obj for coord, obj of @level.obstacles

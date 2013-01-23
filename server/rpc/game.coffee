@@ -1,6 +1,7 @@
 
 # Get game class
 Game = require '../Game'
+assets = require '../assets'
 
 # Empty game instance
 game = {}
@@ -10,19 +11,19 @@ exports.actions = (req, res, ss) ->
 
 	# Load a new level
 	load: (level, player) ->
-		# Make sure level is nice round number as requiring from user input can be risky
-		unless Math.round(Math.abs level)
-			res 'Could not load level'
-			return
 		# Create new game instance
 		game = new Game(level)
-		# Check if level was included ok and set resObj as newly created map
-		resObj = if game then game.level.map else 'Could not load level'
-		# Respond
-		res resObj
+		# Check if level was included ok and respond with map and tilesize
+		res(if game then {map: game.level.map, tile: game.level.tile} else false)
+
+	# Get tile size
+	getSize: -> res(game.level.tile)
 
 	# Get map
 	getMap: -> res(game.level.map)
+
+	# Get image files as dataURIs
+	getAssets: (level) -> assets level, res
 
 	# Get current direction
 	getDirection: -> res(game.level.direction)
