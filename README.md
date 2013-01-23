@@ -1,1 +1,4 @@
-# Welcome to your new realtime app
+
+# CmdGrid
+
+Grid based instructional browser game.
