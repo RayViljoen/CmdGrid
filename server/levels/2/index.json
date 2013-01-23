@@ -1,6 +1,6 @@
 {	
 	"tile": 90,
-	"grid": 4,
+	"grid": 40,
 	"start": "0:0",
 	"direction": "South",
 	"finish": "7:6",
