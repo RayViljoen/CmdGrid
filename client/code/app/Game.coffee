@@ -1,4 +1,8 @@
 
+# TODO:
+# - Move grid creation into class
+# - Create warning tile for missing images
+
 # Global game object constructor
 window.Game = class Game
 	
@@ -44,6 +48,7 @@ window.Game = class Game
 			x: @map.canvas.width/2
 			y: (@map.canvas.height/2)-@map.size/4
 
+		# Get player data
 		@player =
 			start: @parseCoord levelData.start
 			finish: @parseCoord levelData.finish
@@ -51,8 +56,8 @@ window.Game = class Game
 		# Set current position to start
 		@player.position = @player.start
 
-		# Immediattely update player's position
-		@updatePosition @player.start
+		# Create player object
+		do @createPlayer
 
 		# Set finish position
 		@map.grid[@player.finish.x][@player.finish.y] = 'finish'
@@ -106,9 +111,52 @@ window.Game = class Game
 		for sprite in @tiles.getChildren()
 			do sprite.start if sprite.shapeType is 'Sprite'
 
-	# ---------------------------------------------------------------------------
+	# ---------------------------------------------
+	# 	Create player image as directional sprite
+	# ---------------------------------------------
+	createPlayer: ->
+
+		# Warn if no image, SHOULD BE REPLACED WITH ERRTILE
+		unless img = @images.player
+			console.error 'No player image found'
+			return
+		
+		# Animation obj
+		animations = north:[], east:[], south:[], west:[]
+
+		# Get image height based on 4 directions
+		height = img.height / 4
+
+		# Get Number of frames
+		frames = img.width/@dims.size
+
+		# Create animation frame bounds
+		for frame in [0...frames]
+			animations.north.push x:(@dims.size*frame), y:0, width:@dims.size, height:height
+		for frame in [0...frames]
+			animations.east.push x:(@dims.size*frame), y:height * 1, width:@dims.size, height:height
+		for frame in [0...frames]
+			animations.south.push x:(@dims.size*frame), y:height * 2, width:@dims.size, height:height
+		for frame in [0...frames]
+			animations.west.push x:(@dims.size*frame), y:height * 3, width:@dims.size, height:height
+
+		# Get start tile center coords
+		coord = @getTileCenter @player.start.x, @player.start.y
+
+		# Add to tile group
+		@tiles.add new Kinetic.Sprite
+			name: 'player'
+			x: coord.x - @dims.w
+			y: coord.y - (height - @dims.h)
+			fill: '#48FF26'
+			image: img
+			animation: 'west'
+			animations: animations
+			frameRate: frames
+
+	# -----------------------------------------------
 	# 	Loops over map and creates individual tiles
-	# ------------------------------------------------------------------------	
+	# -----------------------------------------------
 	tile: ->
 
 		# Loop tiles

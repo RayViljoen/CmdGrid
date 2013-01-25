@@ -1,11 +1,12 @@
 {	
 	"tile": 90,
 	"grid": 8,
-	"start": "3:3",
+	"start": "6:2",
 	"direction": "east",
 	"finish": "7:5",
 	"obstacles": {
 		"1:1": "alien",
+		"1:6": "alien",
 		"6:6": "default"
 	}
 }
