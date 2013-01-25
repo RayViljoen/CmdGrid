@@ -54,7 +54,7 @@ module.exports = class Game
 			return @level.map[x][y] is 0
 		else no
 
-	# Rover move fn
+	# Player move fn
 	move: (spaces) ->
 		# Check spaces isset to abs number
 		spaces = Math.round(Math.abs spaces)
@@ -72,13 +72,13 @@ module.exports = class Game
 			# Check direction
 			switch @level.direction.toLowerCase()
 				when 'north', 'n'
-					return {ok:no, moves:@level.moves, tile:{x:x,y:y}, win:no} unless @tryTile(x-=1, y) is true
+					return {ok:no, moves:@level.moves, tile:{x,y}, win:no} unless @tryTile(x-=1, y) is true
 				when 'south', 's'
-					return {ok:no, moves:@level.moves, tile:{x:x,y:y}, win:no} unless @tryTile(x+=1, y) is true
+					return {ok:no, moves:@level.moves, tile:{x,y}, win:no} unless @tryTile(x+=1, y) is true
 				when 'east', 'e'
-					return {ok:no, moves:@level.moves, tile:{x:x,y:y}, win:no} unless @tryTile(x, y+=1) is true
+					return {ok:no, moves:@level.moves, tile:{x,y}, win:no} unless @tryTile(x, y+=1) is true
 				when 'west', 'w'
-					return {ok:no, moves:@level.moves, tile:{x:x,y:y}, win:no} unless @tryTile(x, y-=1) is true
+					return {ok:no, moves:@level.moves, tile:{x,y}, win:no} unless @tryTile(x, y-=1) is true
 		
 		# Passed switch so assign position to new last coordinate
 		@level.position = "#{x}:#{y}"
@@ -87,7 +87,7 @@ module.exports = class Game
 		win = @level.position is @level.finish
 
 		# Return ok with new tile xy
-		{ok:yes, moves:@level.moves, tile:{x:x,y:y}, win:win}
+		{ok:yes, moves:@level.moves, tile:{x,y}, win:win}
 
 	# Rover direction change fn
 	turn: (direction) ->
