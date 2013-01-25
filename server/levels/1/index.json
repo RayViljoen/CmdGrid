@@ -5,6 +5,7 @@
 	"direction": "east",
 	"finish": "0:1",
 	"obstacles": {
-		"2:3": "alien"
+		"2:3": "alien",
+		"0:3": "default"
 	}
 }

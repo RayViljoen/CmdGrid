@@ -9,7 +9,7 @@ window.Game = class Game
 	# Loads new game from level data and level assets
 	constructor: (levelData, images, @debug = off) ->
 
-		console.log @debug
+		console.log levelData
 
 		# Create a tiles group
 		@tiles = new Kinetic.Group()
@@ -98,7 +98,6 @@ window.Game = class Game
 
 		# Creates dot in center of each tile to help with debugging
 		@createDebugDot = (tile) ->
-			console.log 'DOTTING'
 			@tiles.add new Kinetic.Circle
 				radius: 2
 				name: "Tile:#{row}:#{tile}"

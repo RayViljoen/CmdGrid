@@ -15,7 +15,7 @@ module.exports = (levelNum, callback) ->
 	return no unless levelNum = Math.round(Math.abs levelNum)
 
 	# Glob image files from level directory
-	glob "./server/levels/#{levelNum}/*.+(jpg|jpeg|png|gif)", (err, images) ->
+	glob "./server/levels/#{levelNum}/assets/*.+(jpg|jpeg|png|gif)", (err, images) ->
 		if err
 			console.log err
 			callback err
