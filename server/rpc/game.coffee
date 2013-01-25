@@ -14,7 +14,7 @@ exports.actions = (req, res, ss) ->
 		# Create new game instance
 		game = new Game(level)
 		# Check if level was included ok and respond with map and tilesize
-		res(if game then {map: game.level.map, tile: game.level.tile} else false)
+		res(if game then game.level else false)
 
 	# Get tile size
 	getSize: -> res(game.level.tile)
