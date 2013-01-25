@@ -15,10 +15,16 @@ window.Game = class Game
 	# ----------------------------------------------------------------
 	# 	Constructor: Loads new game from level data and level assets
 	# ----------------------------------------------------------------
-	constructor: (levelData, images, @debug = off) ->
+	constructor: (levelData, images, debug = off) ->
+
+		# Debug on/of
+		@debug = debug
+
+		# Create debug group if set
+		@debugGroup = new Kinetic.Group() if @debug
 
 		# Debug conditional
-		console.log levelData if debug
+		console.log levelData if @debug
 
 		# Assign images obj
 		@images = images
@@ -38,14 +44,18 @@ window.Game = class Game
 			x: @map.canvas.width/2
 			y: (@map.canvas.height/2)-@map.size/4
 
-		@character =
+		@player =
 			start: @parseCoord levelData.start
 			finish: @parseCoord levelData.finish
 
 		# Set current position to start
-		@character.position = @character.start
+		@player.position = @player.start
 
-		console.log @character
+		# Immediattely update player's position
+		@updatePosition @player.start
+
+		# Set finish position
+		@map.grid[@player.finish.x][@player.finish.y] = 'finish'
 
 		# Create canvas
 		@stage = new Kinetic.Stage
@@ -82,9 +92,31 @@ window.Game = class Game
 			x: @dims.x
 			y: @dims.y
 
+		# Tile the map
+		do @tile
+
+		# Add objects to canvas
+		@layer.add @terrain
+		@layer.add @tiles
+		@layer.add @debugGroup
+		@layer.add @grid
+		@stage.add @layer
+
+		# Start all sprite animations
+		for sprite in @tiles.getChildren()
+			do sprite.start if sprite.shapeType is 'Sprite'
+
+	# ---------------------------------------------------------------------------
+	# 	Loops over map and creates individual tiles
+	# ------------------------------------------------------------------------	
+	tile: ->
+
 		# Loop tiles
 		for row in [0...@map.length]
 			for tile in [0...@map.length]
+
+				# Get img coordinates
+				coord = @getTileCenter row, tile
 
 				# Check tile is not blank
 				if @map.grid[row][tile] isnt 0
@@ -92,36 +124,15 @@ window.Game = class Game
 					# Get image based on tile value
 					img = @images[@map.grid[row][tile]] || @images.default
 					
-					# Get image dimensions
-					imgW = img.width
-					imgH = img.height
-
-					# Set img coordinates
-					coord =
-						x: @dims.x+(@dims.w*tile)-(imgW/2)
-						y: (@dims.y+(@dims.h*tile)+@dims.h)-(imgH-@dims.h)
-
 					# Check if image is a sprite
-					if imgW > @dims.size then @createSpriteTile img, coord
+					if img.width > @dims.size then @createSpriteTile img, coord
+
 					# Else add as image
 					else @createImageTile img, coord
 
 				# Check if debugging is on to plot tiles
-				@createDebugDot tile if debug
+				@createDebugDot coord if @debug
 
-			# Move to next row
-			@dims.x -= @dims.w
-			@dims.y += @dims.h
-
-		# Add objects to canvas
-		@layer.add @terrain
-		@layer.add @tiles
-		@layer.add @grid
-		@stage.add @layer
-
-		# Start all sprite animations
-		for sprite in @tiles.getChildren()
-			do sprite.start if sprite.shapeType is 'Sprite'
 
 	# ---------------------------------------------------------------------------
 	# 	Creates a new sprite object based on image size and adds to tiles group
@@ -137,13 +148,14 @@ window.Game = class Game
 		# Get Number of frames
 		frames = img.width/@dims.size
 
+		# Create animation frame bounds
 		for frame in [0...frames]
 			animations.idle.push x:(@dims.size*frame), y:0, width:@dims.size, height:img.height
 
 		# Add to tile group
 		@tiles.add new Kinetic.Sprite
-			x: coord.x
-			y: coord.y
+			x: coord.x - @dims.w
+			y: coord.y - (img.height - @dims.h)
 			fill: 'orange'
 			image: img
 			animation: 'idle',
@@ -153,12 +165,30 @@ window.Game = class Game
 	# -------------------------------------------------------------
 	# 	Creates dot in center of each tile to help with debugging
 	# -------------------------------------------------------------
-	createDebugDot: (tile) ->
-		@tiles.add new Kinetic.Circle
-			radius: 1
-			x: @dims.x+(@dims.w*tile)
-			y: @dims.y+(@dims.h*tile)+@dims.h
+	createDebugDot: (coord) ->
+
+		# Add circle to center of tile in debugGroup
+		@debugGroup.add new Kinetic.Circle
+			radius: 3
+			x: coord.x
+			y: coord.y
 			fill: 'yellow'
+	
+	# ---------------------------------------
+	# 	Get tile center xy from "x:y" index
+	# ---------------------------------------
+	getTileCenter: (x, y) ->
+
+		# Get top xy
+		center =
+			x: @dims.x + ((x-y) * @dims.w)
+			y: @dims.y + ((y+x) * @dims.h)
+
+		# Offset to center
+		center.y += @dims.h
+
+		# Return
+		center 
 
 	# ------------------------------------------------------
 	# 	Creates a new image object and adds to tiles group
@@ -168,14 +198,17 @@ window.Game = class Game
 		# Add to tile group
 		@tiles.add new Kinetic.Image
 			image: img
-			x: coord.x
-			y: coord.y
+			x: coord.x - (img.width / 2)
+			y: coord.y - (img.height + @dims.h)
 
 	# --------------------------------
 	# 	Parse coord string to xy obj
 	# --------------------------------
 	parseCoord: (coord) ->
+
+		# Split string
 		coord = coord.split ':'
+
 		xy = # Return xy object
 			x: parseInt coord[0], 10
 			y: parseInt coord[1], 10
@@ -183,8 +216,44 @@ window.Game = class Game
 	# -----------------------------------
 	# 	Toggle grid overlay visibillity
 	# -----------------------------------
-	toggleGrid: ->
+	toggleGrid: =>
+
+		# Reverse visibillity
 		if @grid.getVisible() then do @grid.hide else do @grid.show
+
+		# Redraw
 		do @layer.draw
+
+	# -----------------------------------
+	# 	Update player position
+	# -----------------------------------
+	updatePosition: (position) ->
+				
+		# Update new position object
+		@player.position =
+			x: position.x
+			y: position.y
+
+		# Get player image
+		img = @images.player
+
+		coord =
+			x: (@dims.x*-position.x)+(@dims.w*position.y)-(img.width/2)
+			y: ((@dims.y*position.y)+(@dims.h*position.y)+@dims.h)-(img.height-@dims.h)
+
+		@createImageTile img, coord, 'player'
+
+		# anim = new Kinetic.Animation( (frame) ->
+		# 	pl.setX 20
+		# , @layer)
+
+		# anim.start()
+
+		# # Redraw
+		# do @layer.draw
+
+
+
+
 
 

@@ -4,6 +4,9 @@
 # Load app - provides global Game class
 require '/Game'
 
+# Toggle debugging
+debug = on
+
 # Get level from pathname which should be /level*/
 level = location.pathname.match(/^\/level([1-9][0-9]*)/i)?[1]
 
@@ -71,11 +74,18 @@ if level then ss.rpc 'game.load', level, (levelData) ->
 				height: canvasEl.height()
 
 			# Create canvas
-			game = new Game(levelData, images, on)
+			game = new Game(levelData, images, debug)
 
 			# Remove loading gif
 			$('#canvas').css 'background-image', 'none'
 
 			# Listen for grid toggle
 			$('.toggleGrid').click game.toggleGrid
+
+			# Make game instance global to call methods directly
+			window._game = game if debug
+
+			# Show grid if debug
+			do game.toggleGrid if debug
+
 
