@@ -132,12 +132,9 @@ window.Game = class Game
 
 		# Create animation frame bounds
 		for frame in [0...frames]
-			animations.north.push x:(@dims.size*frame), y:0, width:@dims.size, height:height
-		for frame in [0...frames]
+			animations.north.push x:(@dims.size*frame), y:height * 0, width:@dims.size, height:height
 			animations.east.push x:(@dims.size*frame), y:height * 1, width:@dims.size, height:height
-		for frame in [0...frames]
 			animations.south.push x:(@dims.size*frame), y:height * 2, width:@dims.size, height:height
-		for frame in [0...frames]
 			animations.west.push x:(@dims.size*frame), y:height * 3, width:@dims.size, height:height
 
 		# Get start tile center coords
