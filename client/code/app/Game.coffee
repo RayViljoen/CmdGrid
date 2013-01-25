@@ -7,7 +7,12 @@
 window.Game = class Game
 	
 	# Loads new game from level data and level assets
-	constructor: (levelData, images) ->
+	constructor: (levelData, images, @debug = off) ->
+
+		console.log @debug
+
+		# Create a tiles group
+		@tiles = new Kinetic.Group()
 
 		# Assign data to some easier vars
 		map = levelData.map
@@ -18,6 +23,13 @@ window.Game = class Game
 
 		# Get canvas size object
 		canvas = levelData.canvas
+
+		# Calculate tile dimensions
+		tileDim =
+			h: tileSize/4
+			w: tileSize/2
+			x: canvas.width/2
+			y: (canvas.height/2)-mapSize/4
 
 		# Create canvas
 		@stage = new Kinetic.Stage
@@ -30,19 +42,12 @@ window.Game = class Game
 		# Create layer
 		@layer = new Kinetic.Layer()
 
-		# Set general polygon dimaensions
-		dim = {}
-		dim.h = tileSize/4
-		dim.w = tileSize/2
-		dim.x = canvas.width/2
-		dim.y = (canvas.height/2)-mapSize/4
-
 		# Create terrain
 		@grid = new Kinetic.Polygon
 			visible: no
 			fillPatternImage: images.grid
 			fillPatternRepeat: 'repeat'
-			fillPatternOffset: [0,dim.h]
+			fillPatternOffset: [0,tileDim.h]
 			x: canvas.width/2
 			y: (canvas.height/2)-mapSize/4
 			points: [
@@ -56,7 +61,7 @@ window.Game = class Game
 		@terrain = new Kinetic.Polygon
 			fillPatternImage: images.tile
 			fillPatternRepeat: 'repeat'
-			fillPatternOffset: [-10,dim.h]
+			fillPatternOffset: [-10,tileDim.h]
 			x: canvas.width/2
 			y: (canvas.height/2)-mapSize/4
 			points: [
@@ -66,12 +71,56 @@ window.Game = class Game
 				[0, 0]
 			]
 
-		# Group of tiles
-		@tiles = new Kinetic.Group()
+		# Creates a new sprite object based on image size and adds to tiles group
+		@createSpriteTile = (img, coord) ->
+			
+			# Log error if image does not fit tiles as sprite
+			console.error "Image interpreted as sprite with incorrect width: #{img.width}px. Should be divisible by: #{tileSize}px" if img.width % tileSize
+
+			# Animation obj
+			animations = idle:[]
+
+			# Get Number of frames
+			frames = img.width/tileSize
+
+			for frame in [0...frames]
+				animations.idle.push x:(tileSize*frame), y:0, width:tileSize, height:img.height
+
+			# Add to tile group
+			@tiles.add new Kinetic.Sprite
+				x: coord.x
+				y: coord.y
+				fill: 'orange'
+				image: img
+				animation: 'idle',
+				animations: animations
+				frameRate: frames
+
+		# Creates dot in center of each tile to help with debugging
+		@createDebugDot = (tile) ->
+			console.log 'DOTTING'
+			@tiles.add new Kinetic.Circle
+				radius: 2
+				name: "Tile:#{row}:#{tile}"
+				x: tileDim.x+(tileDim.w*tile)
+				y: tileDim.y+(tileDim.h*tile)+tileDim.h
+				fill: 'green'
+
+		# Creates a new image object and adds to tiles group
+		@createImageTile = (img, coord) ->
+
+			# Add to tile group
+			@tiles.add new Kinetic.Image
+				image: img
+				x: coord.x
+				y: coord.y
 
 		# Loop tiles
 		for row in [0...(map.length)]
 			for tile in [0...(map.length)]
+
+				# Check if debugging is on
+				@createDebugDot tile if @debug
 
 				# Check tile is not blank
 				if map[row][tile] isnt 0
@@ -83,37 +132,29 @@ window.Game = class Game
 					imgW = img.width
 					imgH = img.height
 
-					# Get image to use for tile
-					obj = new Kinetic.Image
-						image: img
-						name: "Tile:#{row}:#{tile}"
-						x: dim.x+(dim.w*tile)-(imgW/2)
-						y: (dim.y+(dim.h*tile)+dim.h)-(imgH-tileSize/4)
+					# Set img coordinates
+					coord =
+						x: tileDim.x+(tileDim.w*tile)-(imgW/2)
+						y: (tileDim.y+(tileDim.h*tile)+tileDim.h)-(imgH-tileSize/4)
 
-					# Add to group
-					@tiles.add obj
-
-					# ==============================================
-					# 	Debug image placement with tile center dot
-					# ==============================================
-					# node = new Kinetic.Circle
-					# 	radius: 2
-					# 	name: "Tile:#{row}:#{tile}"
-					# 	x: dim.x+(dim.w*tile)
-					# 	y: dim.y+(dim.h*tile)+dim.h
-					# 	fill: 'green'
-					# @tiles.add node
-					# ==============================================					
+					# Check if image is a sprite
+					if imgW > tileSize then @createSpriteTile img, coord
+					# Else add as image
+					else @createImageTile img, coord				
 
 			# Move to next row
-			dim.x -= dim.w
-			dim.y += dim.h
+			tileDim.x -= tileDim.w
+			tileDim.y += tileDim.h
 
 		# Add objects to canvas
 		@layer.add @terrain
 		@layer.add @tiles
 		@layer.add @grid
 		@stage.add @layer
+
+		# Start all sprite animations
+		for sprite in @tiles.getChildren()
+			do sprite.start if sprite.shapeType is 'Sprite'
 
 	# Toggle grid overlay visibillity
 	toggleGrid: =>
