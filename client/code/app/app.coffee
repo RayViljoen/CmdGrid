@@ -42,7 +42,7 @@ loadAssets = (level, callback) ->
 if level then ss.rpc 'game.load', level, (levelData) ->
 
 	# Check if response ok and load canvas with data
-	unless levelData.map instanceof Array
+	if levelData is false
 		alert 'Could not load level'
 		return
 
@@ -71,7 +71,7 @@ if level then ss.rpc 'game.load', level, (levelData) ->
 				height: canvasEl.height()
 
 			# Create canvas
-			game = new Game(levelData, images)
+			game = new Game(levelData, images, on)
 
 			# Remove loading gif
 			$('#canvas').css 'background-image', 'none'
