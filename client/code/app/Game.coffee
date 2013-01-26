@@ -52,9 +52,6 @@ window.Game = class Game
 		# Set current position to start
 		@player.position = @player.start
 
-		# Create player object
-		do @createPlayer
-
 		# Set finish position
 		@map.grid[@player.finish.x][@player.finish.y] = 'finish'
 
@@ -103,7 +100,7 @@ window.Game = class Game
 		@layer.add @grid
 		@stage.add @layer
 
-		# Start all sprite animations and sort tile zindexes
+		# Start all sprite animations and sort tile zindexes.
 		for tile in @tiles.getChildren()
 			do tile.start if tile.shapeType is 'Sprite' and tile.getName() isnt 'player'
 
@@ -142,7 +139,6 @@ window.Game = class Game
 			id: coord.y
 			x: coord.x - @dims.w
 			y: coord.y - (height - @dims.h)
-			fill: '#48FF26'
 			image: img
 			animation: 'west'
 			animations: animations
@@ -162,17 +158,26 @@ window.Game = class Game
 			# Get img coordinates
 			coord = @getTileCenter x, y
 
+			# Value of current tile
+			tileVal = @map.grid[x][y]
+
 			# Check tile is not blank
-			if @map.grid[x][y] isnt 0
+			if tileVal isnt 0
 
 				# Get image based on tile value
-				img = @images[@map.grid[x][y]] || @images.default
+				img = @images[tileVal] || @images.default
 				
 				# Check if image is a sprite
 				if img.width > @dims.size then @createSpriteTile img, coord
 
 				# Else add as image
 				else @createImageTile img, coord
+
+			# Check if player object
+			else if @player.start.x is x and @player.start.y is y
+
+				# Create player object
+				do @createPlayer
 
 			# Check if debugging is on to plot tiles
 			@createDebugDot coord if @debug
@@ -200,6 +205,17 @@ window.Game = class Game
 		# Return diamond array with indexes
 		diamond
 
+	# ------------------------------------------------------
+	# 	Creates a new image object and adds to tiles group
+	# ------------------------------------------------------
+	createImageTile: (img, coord) ->
+
+		# Add to tile group
+		@tiles.add new Kinetic.Image
+			image: img
+			x: coord.x - (img.width / 2)
+			y: coord.y - (img.height - @dims.h)
+
 	# ---------------------------------------------------------------------------
 	# 	Creates a new sprite object based on image size and adds to tiles group
 	# ---------------------------------------------------------------------------
@@ -220,10 +236,8 @@ window.Game = class Game
 
 		# Add to tile group
 		@tiles.add new Kinetic.Sprite
-			id: coord.y
 			x: coord.x - @dims.w
 			y: coord.y - (img.height - @dims.h)
-			fill: 'orange'
 			image: img
 			animation: 'idle',
 			animations: animations
@@ -255,19 +269,7 @@ window.Game = class Game
 		center.y += @dims.h
 
 		# Return
-		center 
-
-	# ------------------------------------------------------
-	# 	Creates a new image object and adds to tiles group
-	# ------------------------------------------------------
-	createImageTile: (img, coord) ->
-
-		# Add to tile group
-		@tiles.add new Kinetic.Image
-			image: img
-			id: coord.y
-			x: coord.x - (img.width / 2)
-			y: coord.y - (img.height + @dims.h)
+		center
 
 	# --------------------------------
 	# 	Parse coord string to xy obj
