@@ -94,6 +94,14 @@ module.exports = class Game
 		# Check a valid direction is provided
 		unless direction?.match /^(north|south|east|west|[nesw])$/i
 			return {ok:no, m:'Invalid direction'}
+
+		# Set to full direction if abbreviatted
+		switch direction.toLowerCase()
+			when 'n' then direction = 'north'
+			when 's' then direction = 'south'
+			when 'e' then direction = 'east'
+			when 'w' then direction = 'west'
+		
 		@level.direction = direction
-		ok:yes
+		{ok:yes, direction:direction}
 
