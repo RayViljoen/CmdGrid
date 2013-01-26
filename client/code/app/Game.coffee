@@ -304,7 +304,7 @@ window.Game = class Game
 	# -----------------------------------
 	# 	Update player position
 	# -----------------------------------
-	updatePosition: (x, y) ->
+	moveTo: (x, y) ->
 
 		# Update new position object
 		@player.position = {x,y}
@@ -326,18 +326,12 @@ window.Game = class Game
   				# Stop animation
   				@player.node.stop()
 
-
-
-		# anim = new Kinetic.Animation( (frame) ->
-		# 	pl.setX 20
-		# , @layer)
-
-		# anim.start()
-
-		# # Redraw
-		# do @layer.draw
-
-
+  	# ---------------------------
+	# 	Update player direction
+	# ---------------------------
+	turnTo: (direction) ->
+		# Update player animation object
+		@player.node.setAnimation direction
 
 
 
