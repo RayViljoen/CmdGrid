@@ -5,17 +5,7 @@
 
 # Global game object constructor
 window.Game = class Game
-	
-	# --------------------
-	# 	Main tiles group
-	# --------------------
-	tiles: new Kinetic.Group()
-
-	# ---------------------
-	# 	Main canvas layer
-	# ---------------------
-	layer: new Kinetic.Layer()
-
+		
 	# ----------------------------------------------------------------
 	# 	Constructor: Loads new game from level data and level assets
 	# ----------------------------------------------------------------
@@ -29,6 +19,12 @@ window.Game = class Game
 
 		# Debug conditional
 		console.log levelData if @debug
+
+		# Main canvas layer
+		@layer = new Kinetic.Layer()
+
+		# Main tiles group. Hidden until z-indexes sorted
+		@tiles = new Kinetic.Group()
 
 		# Assign images obj
 		@images = images
@@ -107,9 +103,9 @@ window.Game = class Game
 		@layer.add @grid
 		@stage.add @layer
 
-		# Start all sprite animations
-		for sprite in @tiles.getChildren()
-			do sprite.start if sprite.shapeType is 'Sprite'
+		# Start all sprite animations and sort tile zindexes
+		for tile in @tiles.getChildren()
+			do tile.start if tile.shapeType is 'Sprite' and tile.getName() isnt 'player'
 
 	# ---------------------------------------------
 	# 	Create player image as directional sprite
@@ -143,6 +139,7 @@ window.Game = class Game
 		# Add to tile group
 		@tiles.add new Kinetic.Sprite
 			name: 'player'
+			id: coord.y
 			x: coord.x - @dims.w
 			y: coord.y - (height - @dims.h)
 			fill: '#48FF26'
@@ -156,28 +153,52 @@ window.Game = class Game
 	# -----------------------------------------------
 	tile: ->
 
-		# Loop tiles
-		for row in [0...@map.length]
-			for tile in [0...@map.length]
+		# Loop tiles in diamond structure
+		for tile in @arrayToDiamond(@map.length)
 
-				# Get img coordinates
-				coord = @getTileCenter row, tile
+			x = tile.x
+			y = tile.y
+			
+			# Get img coordinates
+			coord = @getTileCenter x, y
 
-				# Check tile is not blank
-				if @map.grid[row][tile] isnt 0
+			# Check tile is not blank
+			if @map.grid[x][y] isnt 0
 
-					# Get image based on tile value
-					img = @images[@map.grid[row][tile]] || @images.default
-					
-					# Check if image is a sprite
-					if img.width > @dims.size then @createSpriteTile img, coord
+				# Get image based on tile value
+				img = @images[@map.grid[x][y]] || @images.default
+				
+				# Check if image is a sprite
+				if img.width > @dims.size then @createSpriteTile img, coord
 
-					# Else add as image
-					else @createImageTile img, coord
+				# Else add as image
+				else @createImageTile img, coord
 
-				# Check if debugging is on to plot tiles
-				@createDebugDot coord if @debug
+			# Check if debugging is on to plot tiles
+			@createDebugDot coord if @debug
 
+	# -----------------------------------------------------------------------------
+	# 	Return array of indexes in diamond/isometric shape
+	# 	Ensures tiles are iterated top to bottom for correct zIndexing
+	# 	See: https://gist.github.com/293566e1eaeb278e1170#file-zigzagarray-coffee
+	# -----------------------------------------------------------------------------	
+	arrayToDiamond: (size) ->
+
+		# Return array
+		diamond = []
+
+		# Top half of array
+		for i in [0...size]
+			for j in [0...(i + 1)]
+				diamond.push {x:j,y:i-j}
+
+		# Bottom half of array
+		for i in [1...(size + 1)]
+			for j in [0...(size - i)]
+				diamond.push {x:i+j, y:size-j-1}
+
+		# Return diamond array with indexes
+		diamond
 
 	# ---------------------------------------------------------------------------
 	# 	Creates a new sprite object based on image size and adds to tiles group
@@ -199,6 +220,7 @@ window.Game = class Game
 
 		# Add to tile group
 		@tiles.add new Kinetic.Sprite
+			id: coord.y
 			x: coord.x - @dims.w
 			y: coord.y - (img.height - @dims.h)
 			fill: 'orange'
@@ -214,7 +236,7 @@ window.Game = class Game
 
 		# Add circle to center of tile in debugGroup
 		@debugGroup.add new Kinetic.Circle
-			radius: 3
+			radius: 2
 			x: coord.x
 			y: coord.y
 			fill: 'yellow'
@@ -243,6 +265,7 @@ window.Game = class Game
 		# Add to tile group
 		@tiles.add new Kinetic.Image
 			image: img
+			id: coord.y
 			x: coord.x - (img.width / 2)
 			y: coord.y - (img.height + @dims.h)
 
