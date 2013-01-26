@@ -1,4 +1,7 @@
 
+# TODO:
+# - Change to controller class/object
+
 # Client Code
 
 # Load app - provides global Game class

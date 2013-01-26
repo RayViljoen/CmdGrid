@@ -160,8 +160,6 @@ window.Game = class Game
 		# Loop tiles in diamond structure
 		for tile in @arrayToDiamond(@map.length)
 
-			console.log "#{tile.x}, #{tile.y}"
-
 			x = tile.x
 			y = tile.y
 			
