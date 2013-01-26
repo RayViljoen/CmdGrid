@@ -48,6 +48,7 @@ window.Game = class Game
 		@player =
 			start: @parseCoord levelData.start
 			finish: @parseCoord levelData.finish
+			direction: levelData.direction
 
 		# Set current position to start
 		@player.position = @player.start
@@ -129,8 +130,8 @@ window.Game = class Game
 		# Create animation frame bounds
 		for frame in [0...frames]
 			animations.north.push x:(@dims.size*frame), y:height * 0, width:@dims.size, height:height
-			animations.east.push x:(@dims.size*frame), y:height * 1, width:@dims.size, height:height
-			animations.south.push x:(@dims.size*frame), y:height * 2, width:@dims.size, height:height
+			animations.south.push x:(@dims.size*frame), y:height * 1, width:@dims.size, height:height
+			animations.east.push x:(@dims.size*frame), y:height * 2, width:@dims.size, height:height
 			animations.west.push x:(@dims.size*frame), y:height * 3, width:@dims.size, height:height
 
 		# Get start tile center coords
@@ -143,7 +144,7 @@ window.Game = class Game
 			x: coord.x - @dims.w
 			y: coord.y - (height - @dims.h)
 			image: img
-			animation: 'west'
+			animation: @player.direction
 			animations: animations
 			frameRate: frames * 3
 
