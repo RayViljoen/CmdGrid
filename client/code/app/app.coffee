@@ -41,6 +41,24 @@ loadAssets = (level, callback) ->
 		# Do callback with img objects
 		callback images
 
+# Handles sending and receiving server responses
+sendCmd = (cmd, callback) ->
+
+	# Check move command type
+	spaces = (cmd.match /^\s*move\s+([1-9]+[0-9]*)\s*$/i)?[1]
+	if spaces
+		ss.rpc 'game.move', spaces, callback
+		return
+
+	# Check turn command type
+	direction = (cmd.match /^\s*turn\s+([A-z]+)\s*$/i)?[1]
+	if direction
+		ss.rpc 'game.turn', direction, callback
+		return
+
+	# Lastly return false if no matched commands
+	callback {ok:no, m:'Invalid command'}
+
 # Load on server
 if level then ss.rpc 'game.load', level, (levelData) ->
 
@@ -87,5 +105,18 @@ if level then ss.rpc 'game.load', level, (levelData) ->
 
 			# Show grid if debug
 			do game.toggleGrid if debug
+
+			# Register cmd submit
+			$('form.terminal').submit ->
+
+				# Get command value
+				cmd = $(@).find('.cmd').val()
+
+				# Pass to handler method
+				sendCmd cmd, (res) ->
+					console.log res
+
+				# Stop submitting
+				no
 
 
