@@ -6,7 +6,7 @@
 	"finish": "5:5",
 	"obstacles": {
 		"1:1": "alien",
-		"1:6": "alien",
+		"1:4": "alien",
 		"2:2": "finish",
 		"5:6": "finish"
 	}

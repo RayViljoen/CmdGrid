@@ -115,11 +115,18 @@ if level then ss.rpc 'game.load', level, (levelData) ->
 			# Register cmd submit
 			$('form.terminal').submit ->
 
+				# Get input el
+				input = $(@).find('.cmd')
+
 				# Get command value
-				cmd = $(@).find('.cmd').val()
+				cmd = input.val()
 
 				# Pass to handler method
 				sendCmd cmd, (res) ->
+
+					# Clear input
+					input.val ''
+
 					# Check server responded
 					if res
 

@@ -160,6 +160,8 @@ window.Game = class Game
 		# Loop tiles in diamond structure
 		for tile in @arrayToDiamond(@map.length)
 
+			console.log "#{tile.x}, #{tile.y}"
+
 			x = tile.x
 			y = tile.y
 			
@@ -270,7 +272,7 @@ window.Game = class Game
 
 		# Get top xy
 		center =
-			x: @dims.x + ((x-y) * @dims.w)
+			x: @dims.x - ((x-y) * @dims.w)
 			y: @dims.y + ((y+x) * @dims.h)
 
 		# Offset to center

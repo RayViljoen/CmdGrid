@@ -72,13 +72,13 @@ module.exports = class Game
 			# Check direction
 			switch @level.direction.toLowerCase()
 				when 'north', 'n'
-					return {ok:no, moves:@level.moves, tile:{x,y}, win:no} unless @tryTile(x, y-=1) is true
-				when 'south', 's'
-					return {ok:no, moves:@level.moves, tile:{x,y}, win:no} unless @tryTile(x, y+=1) is true
-				when 'east', 'e'
-					return {ok:no, moves:@level.moves, tile:{x,y}, win:no} unless @tryTile(x+=1, y) is true
-				when 'west', 'w'
 					return {ok:no, moves:@level.moves, tile:{x,y}, win:no} unless @tryTile(x-=1, y) is true
+				when 'south', 's'
+					return {ok:no, moves:@level.moves, tile:{x,y}, win:no} unless @tryTile(x+=1, y) is true
+				when 'east', 'e'
+					return {ok:no, moves:@level.moves, tile:{x,y}, win:no} unless @tryTile(x, y+=1) is true
+				when 'west', 'w'
+					return {ok:no, moves:@level.moves, tile:{x,y}, win:no} unless @tryTile(x, y-=1) is true
 		
 		# Passed switch so assign position to new last coordinate
 		@level.position = "#{x}:#{y}"
