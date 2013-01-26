@@ -58,7 +58,7 @@ module.exports = class Game
 	move: (spaces) ->
 		# Check spaces isset to abs number
 		spaces = Math.round(Math.abs spaces)
-		return 'Invalid distance' unless spaces
+		return {ok:no, m:'Invalid distance'} unless spaces
 
 		# Add move
 		@level.moves++
