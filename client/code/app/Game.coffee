@@ -203,12 +203,12 @@ window.Game = class Game
 		# Top half of array
 		for i in [0...size]
 			for j in [0...(i + 1)]
-				diamond.push {x:j,y:i-j}
+				diamond.push {x:i-j,y:j}
 
 		# Bottom half of array
 		for i in [1...(size + 1)]
 			for j in [0...(size - i)]
-				diamond.push {x:i+j, y:size-j-1}
+				diamond.push {x:size-j-1, y:i+j}
 
 		# Return diamond array with indexes
 		diamond

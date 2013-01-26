@@ -47,17 +47,23 @@ sendCmd = (cmd, callback) ->
 	# Check move command type
 	spaces = (cmd.match /^\s*move\s+([1-9]+[0-9]*)\s*$/i)?[1]
 	if spaces
-		ss.rpc 'game.move', spaces, callback
+		ss.rpc 'game.move', spaces, (res) ->
+			res._type = 'move'
+			console.log res if debug
+			callback res
 		return
 
 	# Check turn command type
 	direction = (cmd.match /^\s*turn\s+([A-z]+)\s*$/i)?[1]
 	if direction
-		ss.rpc 'game.turn', direction, callback
+		ss.rpc 'game.turn', direction, (res) ->
+			res._type = 'turn'
+			console.log res if debug
+			callback res
 		return
 
 	# Lastly return false if no matched commands
-	callback {ok:no, m:'Invalid command'}
+	callback no
 
 # Load on server
 if level then ss.rpc 'game.load', level, (levelData) ->
@@ -114,7 +120,20 @@ if level then ss.rpc 'game.load', level, (levelData) ->
 
 				# Pass to handler method
 				sendCmd cmd, (res) ->
-					console.log res
+					# Check server responded
+					if res
+
+						# Check server response was not invalid
+						unless res.ok
+							alert res.m
+							return
+
+						# Check command type and send to cavas method
+						if res._type is 'move' then game.moveTo(res.tile.x, res.tile.y)
+						if res._type is 'turn' then game.turnTo(res.direction)
+
+					# Else alert user
+					else alert 'Invalid command'
 
 				# Stop submitting
 				no
