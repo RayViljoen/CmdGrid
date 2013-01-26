@@ -6,6 +6,9 @@ module.exports = class Game
 		# Reset level incase not the first round
 		@level = {}
 
+		# Track win status to reject any post-win commands
+		@won = no
+
 		# Make sure levelNum is nothing other than a round number
 		# Do not want user specied include paths in require statement that follows
 		return no unless levelNum = Math.round(Math.abs levelNum)
@@ -56,6 +59,10 @@ module.exports = class Game
 
 	# Player move fn
 	move: (spaces) ->
+
+		# Reject any commands if game is won
+		return {ok:no, m:'Game won'} if @won
+
 		# Check spaces isset to abs number
 		spaces = Math.round(Math.abs spaces)
 		return {ok:no, m:'Invalid distance'} unless spaces
@@ -84,13 +91,17 @@ module.exports = class Game
 		@level.position = "#{x}:#{y}"
 
 		# Check if position is on _finish
-		win = @level.position is @level.finish
+		@won = @level.position is @level.finish
 
 		# Return ok with new tile xy
-		{ok:yes, moves:@level.moves, tile:{x,y}, win:win}
+		{ok:yes, moves:@level.moves, tile:{x,y}, @won}
 
 	# Rover direction change fn
 	turn: (direction) ->
+
+		# Reject any commands if game is won
+		return {ok:no, m:'Game won'} if @won
+
 		# Check a valid direction is provided
 		unless direction?.match /^(north|south|east|west|[nesw])$/i
 			return {ok:no, m:'Invalid direction'}
