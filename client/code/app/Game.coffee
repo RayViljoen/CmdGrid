@@ -96,7 +96,7 @@ window.Game = class Game
 		# Add objects to canvas
 		@layer.add @terrain
 		@layer.add @tiles
-		@layer.add @debugGroup
+		@layer.add @debugGroup if @debug
 		@layer.add @grid
 		@stage.add @layer
 
@@ -120,6 +120,9 @@ window.Game = class Game
 		# Get image height based on 4 directions
 		height = img.height / 4
 
+		# Store image height in player obj
+		@player.height = height
+
 		# Get Number of frames
 		frames = img.width/@dims.size
 
@@ -134,7 +137,7 @@ window.Game = class Game
 		coord = @getTileCenter @player.start.x, @player.start.y
 
 		# Add to tile group
-		@tiles.add new Kinetic.Sprite
+		node = new Kinetic.Sprite
 			name: 'player'
 			id: coord.y
 			x: coord.x - @dims.w
@@ -142,7 +145,11 @@ window.Game = class Game
 			image: img
 			animation: 'west'
 			animations: animations
-			frameRate: frames
+			frameRate: frames * 3
+
+		# Add node to player obj & tiles group
+		@player.node = node
+		@tiles.add node
 
 	# -----------------------------------------------
 	# 	Loops over map and creates individual tiles
@@ -297,21 +304,29 @@ window.Game = class Game
 	# -----------------------------------
 	# 	Update player position
 	# -----------------------------------
-	updatePosition: (position) ->
-				
+	updatePosition: (x, y) ->
+
 		# Update new position object
-		@player.position =
-			x: position.x
-			y: position.y
+		@player.position = {x,y}
 
-		# Get player image
-		img = @images.player
+		# Get destination coordinates
+		coord = @getTileCenter x, y
 
-		coord =
-			x: (@dims.x*-position.x)+(@dims.w*position.y)-(img.width/2)
-			y: ((@dims.y*position.y)+(@dims.h*position.y)+@dims.h)-(img.height-@dims.h)
+		# Start animation
+		@player.node.start()
 
-		@createImageTile img, coord, 'player'
+		# Start transition
+		@player.node.transitionTo
+  			 
+  			x: coord.x - @dims.w
+  			y: coord.y - (@player.height - @dims.h)
+  			duration: 3
+  			callback: =>
+
+  				# Stop animation
+  				@player.node.stop()
+
+
 
 		# anim = new Kinetic.Animation( (frame) ->
 		# 	pl.setX 20
