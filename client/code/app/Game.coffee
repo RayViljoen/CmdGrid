@@ -21,7 +21,7 @@ window.Game = class Game
 		console.log levelData if @debug
 
 		# Main canvas layer
-		@layer = new Kinetic.Layer()
+		@layer = new Kinetic.Layer(setClearBeforeDraw:no)
 
 		# Main tiles group. Hidden until z-indexes sorted
 		@tiles = new Kinetic.Group()
@@ -104,11 +104,13 @@ window.Game = class Game
 		# Start all sprite animations and sort tile zindexes.
 		for tile in @tiles.getChildren()
 			do tile.start if tile.shapeType is 'Sprite' and tile.getName() isnt 'player'
+			# tile.index = tile.attrs.z
+		@player.node.setZIndex 99
 
 	# ---------------------------------------------
 	# 	Create player image as directional sprite
 	# ---------------------------------------------
-	createPlayer: ->
+	createPlayer: (z) ->
 
 		# Warn if no image, SHOULD BE REPLACED WITH ERRTILE
 		unless img = @images.player
@@ -140,13 +142,14 @@ window.Game = class Game
 		# Add to tile group
 		node = new Kinetic.Sprite
 			name: 'player'
-			id: coord.y
+			opacity: 0.75
 			x: coord.x - @dims.w
 			y: coord.y - (height - @dims.h)
 			image: img
 			animation: @player.direction
 			animations: animations
 			frameRate: frames * 3
+			z: z
 
 		# Add node to player obj & tiles group
 		@player.node = node
@@ -162,6 +165,7 @@ window.Game = class Game
 
 			x = tile.x
 			y = tile.y
+			z = x + y
 			
 			# Get img coordinates
 			coord = @getTileCenter x, y
@@ -176,16 +180,16 @@ window.Game = class Game
 				img = @images[tileVal] || @images.default
 				
 				# Check if image is a sprite
-				if img.width > @dims.size then @createSpriteTile img, coord
+				if img.width > @dims.size then @createSpriteTile img, coord, z
 
 				# Else add as image
-				else @createImageTile img, coord
+				else @createImageTile img, coord, z
 
 			# Check if player object
 			else if @player.start.x is x and @player.start.y is y
 
 				# Create player object
-				do @createPlayer
+				@createPlayer z
 
 			# Check if debugging is on to plot tiles
 			@createDebugDot coord if @debug
@@ -216,18 +220,19 @@ window.Game = class Game
 	# ------------------------------------------------------
 	# 	Creates a new image object and adds to tiles group
 	# ------------------------------------------------------
-	createImageTile: (img, coord) ->
+	createImageTile: (img, coord, z) ->
 
 		# Add to tile group
 		@tiles.add new Kinetic.Image
 			image: img
 			x: coord.x - (img.width / 2)
 			y: coord.y - (img.height - @dims.h)
+			z: z
 
 	# ---------------------------------------------------------------------------
 	# 	Creates a new sprite object based on image size and adds to tiles group
 	# ---------------------------------------------------------------------------
-	createSpriteTile: (img, coord) ->
+	createSpriteTile: (img, coord, z) ->
 		
 		# Log error if image does not fit tiles as sprite
 		console.error "Image interpreted as sprite with incorrect width: #{img.width}px. Should be divisible by: #{@dims.size}px" if img.width % @dims.size
@@ -250,6 +255,7 @@ window.Game = class Game
 			animation: 'idle',
 			animations: animations
 			frameRate: frames
+			z: z
 
 	# -------------------------------------------------------------
 	# 	Creates dot in center of each tile to help with debugging
@@ -318,12 +324,10 @@ window.Game = class Game
 
 		# Start transition
 		@player.node.transitionTo
-  			 
   			x: coord.x - @dims.w
   			y: coord.y - (@player.height - @dims.h)
   			duration: 3
   			callback: =>
-
   				# Stop animation
   				@player.node.stop()
 

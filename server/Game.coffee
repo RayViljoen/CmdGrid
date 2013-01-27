@@ -1,24 +1,10 @@
 # Game class
-module.exports = class Game
+class Game
 
-	constructor: (levelNum, player = 'Guest') ->
-
-		# Reset level incase not the first round
-		@level = {}
+	constructor: (@level, player = 'Guest') ->
 
 		# Track win status to reject any post-win commands
 		@won = no
-
-		# Make sure levelNum is nothing other than a round number
-		# Do not want user specied include paths in require statement that follows
-		return no unless levelNum = Math.round(Math.abs levelNum)
-
-		# Load level from config or fail gracefully if not found
-		try @level = require "./levels/#{levelNum}/"
-		catch e then return no
-
-		# Store level number
-		@level.num = levelNum
 
 		# Store player name
 		@level.player = player
@@ -116,3 +102,4 @@ module.exports = class Game
 		@level.direction = direction
 		{ok:yes, direction:direction}
 
+module.exports = Game

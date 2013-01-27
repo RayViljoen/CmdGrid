@@ -6,12 +6,16 @@
   "engines": {
     "node": ">= 0.6.0"
   },
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
     "socketstream": "0.3.x",
     "ss-coffee": "0.1.x",
     "ss-jade": "0.1.x",
     "ss-stylus": "0.1.x",
     "datauri": "~0.1.1",
-    "glob": "~3.1.15"
+    "glob": "~3.1.15",
+    "clone": "~0.1.5"
   }
 }
