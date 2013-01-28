@@ -115,11 +115,21 @@ if level then ss.rpc 'game.load', level, (levelData) ->
 			# Show grid if debug
 			do game.toggleGrid if debug
 
+			# Directional controls
+			$('.move button').click ->
+				game.moveMap $(@).attr('class')
+
 			# Register cmd submit
 			$('form.terminal').submit ->
 
 				# Get input el
 				input = $(@).find('.cmd')
+
+				# Disable input
+				input.attr('disabled','disabled').addClass('disabled')
+
+				# Function to re-enable input
+				resume = -> input.removeAttr('disabled').removeClass('disabled')
 
 				# Get command value
 				cmd = input.val()
@@ -135,15 +145,31 @@ if level then ss.rpc 'game.load', level, (levelData) ->
 
 						# Check server response was not invalid
 						unless res.ok
+
+							# Enable input
+							do resume
+
 							alert res.m
 							return
 
 						# Check command type and send to cavas method
-						if res._type is 'move' then game.moveTo(res.tile.x, res.tile.y)
-						if res._type is 'turn' then game.turnTo(res.direction)
+						if res._type is 'move' then game.moveTo(res.tile.x, res.tile.y, resume)
+
+						else if res._type is 'turn'
+							game.turnTo(res.direction)
+							# Enable input
+							do resume
+
+						else alert 'Unknown server response'
 
 					# Else alert user
-					else alert 'Invalid command'
+					else
+
+						# Enable input
+						do resume
+
+						# Invalid command entered
+						alert 'Invalid command'
 
 				# Stop submitting
 				no

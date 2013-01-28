@@ -21,7 +21,7 @@ window.Game = class Game
 		console.log levelData if @debug
 
 		# Main canvas layer
-		@layer = new Kinetic.Layer(setClearBeforeDraw:no)
+		@layer = new Kinetic.Layer()
 
 		# Main tiles group. Hidden until z-indexes sorted
 		@tiles = new Kinetic.Group()
@@ -62,7 +62,7 @@ window.Game = class Game
 			width: @map.canvas.width
 			height: @map.canvas.height
 			# Draggable only if canvas is bigger than container
-			draggable: @map.canvas.width < @map.size
+			# draggable: @map.canvas.width < @map.size
 
 		# Points for creating a map sized polygon
 		mapPolyPoints = [
@@ -106,6 +106,37 @@ window.Game = class Game
 			do tile.start if tile.shapeType is 'Sprite' and tile.getName() isnt 'player'
 			# tile.index = tile.attrs.z
 		@player.node.setZIndex 99
+
+	# ----------------------------------
+	# 	Move map one tile in direction
+	# ----------------------------------
+	moveMap: (direction, x, y) ->
+
+		x ?= @dims.w
+		y ?= @dims.h
+
+		cx = @layer.getX()
+		cy = @layer.getY()
+
+		switch direction
+			when 'n'
+				cx += x
+				cy -= y
+			when 's'
+				cx -= x
+				cy += y
+			when 'e'
+				cx += x
+				cy += y
+			when 'w'
+				cx -= x
+				cy -= y
+
+		# Start transition
+		@layer.transitionTo
+			x: cx
+			y: cy
+			duration: 0.1
 
 	# ---------------------------------------------
 	# 	Create player image as directional sprite
@@ -311,7 +342,7 @@ window.Game = class Game
 	# -----------------------------------
 	# 	Update player position
 	# -----------------------------------
-	moveTo: (x, y) ->
+	moveTo: (x, y, done) ->
 
 		# Update new position object
 		@player.position = {x,y}
@@ -324,17 +355,22 @@ window.Game = class Game
 
 		# Start transition
 		@player.node.transitionTo
-  			x: coord.x - @dims.w
-  			y: coord.y - (@player.height - @dims.h)
-  			duration: 3
-  			callback: =>
-  				# Stop animation
-  				@player.node.stop()
+			x: coord.x - @dims.w
+			y: coord.y - (@player.height - @dims.h)
+			duration: 2
+			callback: =>
+				
+				# Stop animation
+				@player.node.stop()
 
-  	# ---------------------------
+				# Do client callback
+				do done
+
+	# ---------------------------
 	# 	Update player direction
 	# ---------------------------
 	turnTo: (direction) ->
+		
 		# Update player animation object
 		@player.node.setAnimation direction
 
