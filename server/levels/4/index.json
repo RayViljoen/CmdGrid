@@ -1,0 +1,27 @@
+{	
+	"name": "Mars Level 4",
+	"tile": 90,
+	"grid": 10,
+	"start": "3:8",
+	"direction": "east",
+	"finish": "7:7",
+	"obstacles": {
+		"0:2": "crate",
+		"0:7": "crate",
+		"1:2": "alien",
+		"2:4": "crashsmoke",
+		"3:3": "crashwindow",
+		"3:7": "crate",
+		"5:0": "crate",
+		"5:5": "monolith",
+		"5:9": "crate",
+		"6:2": "alien",
+		"6:7": "alien",
+		"6:8": "crashwindow",
+		"7:2": "crashsmoke",
+		"7:6": "alien",
+		"7:8": "crashsmoke",
+		"8:1": "crashwindow",
+		"8:6": "crate"
+	}
+}
