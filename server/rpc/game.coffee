@@ -1,7 +1,6 @@
-
 # Get game class
 Game = require '../Game'
-assets = require '../assets'
+assets = require '../Assets'
 
 # Object cloning library
 clone = require 'clone'
