@@ -3,7 +3,7 @@
 	"tile": 90,
 	"grid": 8,
 	"start": "5:4",
-	"direction": "north",
+	"direction": "east",
 	"finish": "5:5",
 	"obstacles": {
 		"0:0": "finish",

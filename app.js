@@ -11,9 +11,22 @@ ss.client.define('main', {
   tmpl: '*'
 });
 
+// Define a single-page client called 'main'
+ss.client.define('scores', {
+  view: 'scores.jade',
+  css:  ['app.styl', 'simple.datagrid.css'],
+  code: ['libs/jquery.min.js', 'libs/simple.datagrid.js', 'scores'],
+  tmpl: '*'
+});
+
 // Serve this client on the root URL
 ss.http.route('/', function(req, res){
   res.serveClient('main');
+});
+
+// Serve this client on the /scores/ URL
+ss.http.route('/scores/', function(req, res){
+  res.serveClient('scores');
 });
 
 // Code Formatters

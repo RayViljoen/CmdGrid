@@ -1,10 +1,20 @@
 
 # Get score class
-Same = require '../Score'
+Score = require '../Score'
 
 # RPC interface
 exports.actions = (req, res, ss) ->
 
 	# Save score
-	score: (score, etc) ->
-		console.log 'Save game to some db'
+	save: (score) ->
+		
+		# Save score
+		Score.save score
+
+		# Signal done
+		do res
+
+	get: ->
+
+		# Get highscores
+		Score.get res

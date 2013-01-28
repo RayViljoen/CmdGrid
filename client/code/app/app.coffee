@@ -153,10 +153,23 @@ if level then ss.rpc 'game.load', level, (levelData) ->
 							return
 
 						# Check command type and send to cavas method
-						if res._type is 'move' then game.moveTo(res.tile.x, res.tile.y, resume)
+						if res._type is 'move'
+							game.moveTo res.tile.x, res.tile.y, ->
+								# Enable input
+								do resume
+
+								# Check if game is won
+								if res.won
+									level = levelData.name
+									score = Math.round(100/res.moves)
+									player = prompt "You scored: #{score}\nEnter your name:"
+									# Send score to server
+									ss.rpc 'score.save', {player,score,level}, ->
+										# Redirect to hi scores
+										window.location = '/scores/'
 
 						else if res._type is 'turn'
-							game.turnTo(res.direction)
+							game.turnTo res.direction
 							# Enable input
 							do resume
 

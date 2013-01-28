@@ -92,6 +92,9 @@ class Game
 		unless direction?.match /^(north|south|east|west|[nesw])$/i
 			return {ok:no, m:'Invalid direction'}
 
+		# Add move
+		@level.moves++
+
 		# Set to full direction if abbreviatted
 		switch direction.toLowerCase()
 			when 'n' then direction = 'north'
