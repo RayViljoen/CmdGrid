@@ -1,4 +1,3 @@
-
 # TODO:
 # - Move grid creation into class
 # - Create warning tile for missing images
@@ -119,16 +118,16 @@ window.Game = class Game
 		cy = @layer.getY()
 
 		switch direction
-			when 'n'
+			when 's'
 				cx += x
 				cy -= y
-			when 's'
+			when 'n'
 				cx -= x
 				cy += y
-			when 'e'
+			when 'w'
 				cx += x
 				cy += y
-			when 'w'
+			when 'e'
 				cx -= x
 				cy -= y
 
