@@ -1,15 +1,20 @@
 {	
-	"name": "Mars",
+	"name": "Mars Level 1",
 	"tile": 90,
 	"grid": 8,
-	"start": "5:4",
+	"start": "2:3",
 	"direction": "east",
 	"finish": "5:5",
 	"obstacles": {
-		"0:0": "finish",
-		"1:1": "alien",
-		"2:2": "finish",
-		"0:2": "alien",
-		"7:0": "finish"
+		"5:4": "crate",
+		"5:4": "crate",
+		"4:5": "crate",
+		"1:5": "crate",
+		"3:6": "crate",
+		"4:6": "crate",
+		"0:2": "crate",
+		"7:0": "crate",
+		"5:2": "crate",
+		"5:3": "crate"
 	}
 }
